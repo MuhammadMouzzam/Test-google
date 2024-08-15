@@ -1,4 +1,4 @@
-import re
+from . import schemas
 from fastapi import FastAPI
 from fastapi.requests import Request
 from authlib.integrations.starlette_client import OAuth, OAuthError
@@ -17,7 +17,7 @@ auth.register(
     client_secret = settings.client_secret,
     client_kwargs = {
         'scope' : 'email openid profile',
-        'redirect_url' : 'http://127.0.0.1:8080/auth'
+        'redirect_url' : 'https://test-google.onrender.com/auth'
     }
 )
 
@@ -30,7 +30,7 @@ async def login(request : Request):
     url = request.url_for('autho')
     return await auth.google.authorize_redirect(request, url)
     
-@app.get('/auth')
+@app.get('/auth', response_model=schemas.GoogleUser)
 async def autho(request : Request):
     try:
         token = await auth.google.authorize_access_token(request)
