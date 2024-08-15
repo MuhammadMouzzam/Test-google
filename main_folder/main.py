@@ -1,3 +1,4 @@
+import re
 from fastapi import FastAPI
 from fastapi.requests import Request
 from authlib.integrations.starlette_client import OAuth, OAuthError
@@ -26,15 +27,16 @@ def main_page():
 
 @app.get('/login')
 async def login(request : Request):
-    return await auth.google.authorize_redirect(request, app.url_path_for('autho'))
+    url = request.url_for('autho')
+    return await auth.google.authorize_redirect(request, url)
     
 @app.get('/auth')
-def autho(request : Request):
+async def autho(request : Request):
     try:
-        token = auth.google.authorize_accesss_token(request)
+        token = await auth.google.authorize_access_token(request)
     except OAuthError as e:
-        return None
+        return "Authentication Failed"
     user = token.get('userinfo')
     if user:
-        request.session['user'] = dict(user)
-    return request.session['user']
+        request.session['user'] = user
+    return 'hello'
