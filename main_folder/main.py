@@ -39,4 +39,4 @@ async def autho(request : Request):
     user = token.get('userinfo')
     if user:
         request.session['user'] = user
-    return 'hello'
+    return user
